@@ -16,9 +16,6 @@ def cards():
     print(real_cards)
     return real_cards
 
-
-card_deck = cards()
-
 # creating a class for a player
 
 
@@ -44,7 +41,7 @@ class Player:
         # dictionary of scores
         card_values = {
             "A": 11,
-            "j": 10,
+            "J": 10,
             "Q": 10,
             "K": 10,
             "2": 2,
@@ -84,6 +81,7 @@ class Player:
     def pay(self, amount): # function for making payment
         self.money -= amount
 
+    # in case there is a win
     def win(self, result):  # a function to calculate the win
         if result == True:
             if self.score == 21 and len(self.hand) == 2:
@@ -94,20 +92,62 @@ class Player:
         else:
             self.bet = 0
 
+    # showing the betting money
     def bet_money(self, amount):
         self.money -= amount
         self.bet += amount
 
+    # checking for black in the game
+    def check_black(self):
+        if self.score == 21 and len(self.hand) == 2:
+            return True
+        else:
+            return False
 
-first_player = Player(["A", "A", "2", "A"])
-first_player.hit_card("A")
-print(first_player)
-first_player.play(["K", "10"])
-print(first_player)
-first_player.bet_money(30)
-print(first_player.money, first_player.bet)
-first_player.win(True)
-print(first_player.money, first_player.bet)
-print(first_player.money)
-first_player.win(20)
-print(first_player.money)
+    # if the game ends draw
+    def draw_game(self):
+        self.money += self.bet
+        self.bet = 0
+
+
+# hiding the computers score
+def print_computer_player(computer_player):
+    for card in range(len(computer_player.hand)):
+        if card == 0:
+            print("x", end=" ")
+        elif card == len(computer_player.hand) - 1:
+            print(card)
+        else:
+            print(computer_player.hand[card])
+
+
+# initiating the playing of the game
+card_play = cards()
+first_hand = [card_play.pop(), card_play.pop()]
+second_hand = [card_play.pop(), card_play.pop()]
+first_player = Player(first_hand)
+computer_player = Player(second_hand)
+
+# determining the winner and blackjack
+if first_player.check_black():
+    if computer_player.check_black():
+        first_player.draw_game()
+    else:
+        first_player.win(True)
+
+# playing the game
+while first_player.score < 21:
+
+    user_action = input("Do you want another card: (y/n): ").lower()
+    if user_action == "y":
+        first_player.hit_card(card_play.pop())
+        print(first_player)
+        print_computer_player(computer_player)
+    elif user_action == "n":
+        print(first_player)
+        print(computer_player)
+    else:
+        print("invalid option ")
+        break
+while computer_player.score < 16:
+    computer_player.hit_card(card_play.pop())
