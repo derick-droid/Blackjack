@@ -78,7 +78,7 @@ class Player:
         self.hand = another_hand
         self.score = self.live_score()
 
-    def pay(self, amount): # function for making payment
+    def pay(self, amount):  # function for making payment
         self.money -= amount
 
     # in case there is a win
@@ -96,6 +96,8 @@ class Player:
     def bet_money(self, amount):
         self.money -= amount
         self.bet += amount
+        if self.money <= 0:
+            print("you do not have enough cash")
 
     # checking for black in the game
     def check_black(self):
@@ -128,26 +130,58 @@ second_hand = [card_play.pop(), card_play.pop()]
 first_player = Player(first_hand)
 computer_player = Player(second_hand)
 
-# determining the winner and blackjack
-if first_player.check_black():
-    if computer_player.check_black():
-        first_player.draw_game()
-    else:
-        first_player.win(True)
+while (first_player.money > 1):
+    
+    if len(cards()) < 20:
+        card_play = cards()
+        first_hand = [card_play.pop(), card_play.pop()]
+        second_hand = [card_play.pop(), card_play.pop()]
+        first_player = Player(first_hand)
+        computer_player = Player(second_hand)
 
-# playing the game
-while first_player.score < 21:
+    # placing a bet
+    player_bet = int(input("enter you bet: "))
+    first_player.bet_money(player_bet)
 
-    user_action = input("Do you want another card: (y/n): ").lower()
-    if user_action == "y":
-        first_player.hit_card(card_play.pop())
-        print(first_player)
-        print_computer_player(computer_player)
-    elif user_action == "n":
-        print(first_player)
-        print(computer_player)
-    else:
-        print("invalid option ")
-        break
-while computer_player.score < 16:
-    computer_player.hit_card(card_play.pop())
+    # determining the winner and blackjack
+    if first_player.check_black():
+        if computer_player.check_black():
+            first_player.draw_game()
+        else:
+            first_player.win(True)
+
+    # playing the game
+    while first_player.score < 21:
+
+        user_action = input("Do you want another card: (y/n): ").lower()
+        if user_action == "y":
+            first_player.hit_card(card_play.pop())
+            print(first_player)
+            print_computer_player(computer_player)
+        elif user_action == "n":
+            print(first_player)
+            print(computer_player)
+        else:
+            print("invalid option ")
+
+    while computer_player.score < 16:
+        computer_player.hit_card(card_play.pop())
+
+        # checking for the win
+        if first_player.score > 21:
+            if computer_player.score > 21:
+                first_player.draw_game()
+        elif first_player.score > computer_player.score:
+            first_player.win(True)
+        elif first_player.score == computer_player.score:
+            first_player.draw_game()
+        else:
+            if computer_player.score > 21:
+                first_player.win(True)
+            else:
+                first_player.win(False)
+
+    print(first_player.money)
+    print(computer_player)
+
+
